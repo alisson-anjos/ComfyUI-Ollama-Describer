@@ -21,7 +21,7 @@ class LlavaDescriber:
                 "image": ("IMAGE",),  
                 "model": (["llava:7b-v1.6", "llava:13b-v1.6", "llava:34b-v1.6"],),
                 "prompt": ("STRING", {
-                    "default": "describe this image and make sure to include anything notable about it",
+                    "default": "Return a list of danbooru tags for this image, formatted as lowercase, separated by commas.",
                     "multiline": True
                 }),
                 "temperature": ("FLOAT", {
@@ -86,24 +86,31 @@ class LlavaDescriber:
         print('Generating Annotation from Image')
         full_response = ""
         
+        system_context = """You are an assistant who describes the content and composition of images. 
+        Describe only what you see in the image, not what you think the image is about.Be factual and literal. 
+        Do not use metaphors or similes. Be concise.
+        """
+        
+        print(run_mode)
+        
         if run_mode == "Local (Ollama)":
             models = [model_l['name'] for model_l in ollama.list()['models']]
              
             if model not in models:
                 self.pull_model(model, ollama)
                 
-            full_response = ollama.generate(model=model, prompt=prompt, images=[image_bytes], stream=False, options={
+            full_response = ollama.generate(model=model, system=system_context, prompt=prompt, images=[image_bytes], stream=False, options={
                  'num_predict': max_tokens,
                  'temperature': temperature,
             })
         else:
-            client = Client(api_host)
+            client = Client(api_host, timeout=30)
             models = [model_l['name'] for model_l in client.list()['models']]
             
             if model not in models:
                 self.pull_model(model, client)
                 
-            full_response = client.generate(model=model, prompt=prompt, images=[image_bytes], stream=False, options={
+            full_response = client.generate(model=model, system=system_context, prompt=prompt, images=[image_bytes], stream=False, options={
                  'num_predict': max_tokens,
                  'temperature': temperature,
             })
