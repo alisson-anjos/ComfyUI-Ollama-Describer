@@ -38,8 +38,8 @@ After installing Ollama and getting it running, you can use the extension in you
 
 ## Usage
 Add the node via `image` -> `LlaVa Describer by Alisson`  
-- **model**: Select one of the models, 7b, 13b, 34b. The larger the model, the longer it will take. If you don't have the necessary hardware, it is advised to use the 13b model.
-- **temperature**: The higher this value, or the closer to 1, the more creative/random the response will be. In other words, the model may even stray from the context of the prompt.
+- **model**: Select one of the models, 7b, 13b or 34b, the greater the number of parameters in the selected model the longer it will take to execute the prompt and return the response, use according to the capabilities of your hardware, I advise using 13b.
+- **temperature**: The higher this value, or closer to 1, the more creative/random the answer will be. In other words, the model may not follow the instructions added in your prompt or even add false information, the LLaVa model provides good answers with temperatures from 0.2 and below.
 - **prompt**: Text provided to the model containing a question or instruction.
 - **max_tokens**: Maximum length of response, in tokens. A token is approximately half a word.
 - **run_mode**: There are two ways to use Ollama: through the library directly installed on the machine (Windows, Linux, and Mac) or through Docker using the API endpoint provided by the container. Choose according to the method used for installation.
