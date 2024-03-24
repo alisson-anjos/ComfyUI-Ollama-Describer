@@ -31,7 +31,7 @@ if exist ..\..\..\python_embeded\python.exe (
 
 :: Install the package
 echo Installing...
-%PYTHON% -m pip install -r requirements.txt
+%PYTHON% install.py
 echo Done^!
 
 @pause
