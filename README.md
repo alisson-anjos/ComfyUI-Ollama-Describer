@@ -1,6 +1,6 @@
 # ComfyUI-LLaVA-Describer
 
-This is an extension for ComfyUI to extract descriptions from your images using the multimodal model called LLaVa. The LLaVa model - Large Language and Vision Assistant, although trained on a relatively small dataset, demonstrates exceptional capabilities in understanding images and answering questions about them. This model shows behaviors similar to multimodal models like GPT-4, even when presented with unseen images and instructions.
+This is an extension for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) to extract descriptions from your images using the multimodal model called LLaVa. The LLaVa model - Large Language and Vision Assistant, although trained on a relatively small dataset, demonstrates exceptional capabilities in understanding images and answering questions about them. This model shows behaviors similar to multimodal models like GPT-4, even when presented with unseen images and instructions.
 
 For more information about the LLaVa model, visit: [LLaVa Model Website](https://llava-vl.github.io/)
 
