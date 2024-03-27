@@ -15,7 +15,10 @@ class LlavaDescriber:
               "run_mode": (["Local (Ollama)", "API (Ollama)"],),
               "api_host": ("STRING", {
                   "default": "http://localhost:11434"
-              })  
+              }),
+              'system_context': ("STRING", {
+                  "forceInput": True
+              }),
             },
             "required": {
                 "image": ("IMAGE",),  
@@ -74,7 +77,7 @@ class LlavaDescriber:
             current_digest = digest
   
   
-    def process_image(self, image, model, prompt, temperature, max_tokens, run_mode, api_host):
+    def process_image(self, image, model, prompt, temperature, max_tokens, run_mode, api_host, system_context=None):
         print('Converting Tensor to Image')
         img = self.tensor_to_image(image)
         
@@ -85,11 +88,15 @@ class LlavaDescriber:
         
         print('Generating Annotation from Image')
         full_response = ""
-        
-        system_context = """You are an assistant who describes the content and composition of images. 
-        Describe only what you see in the image, not what you think the image is about.Be factual and literal. 
-        Do not use metaphors or similes. Be concise.
-        """
+
+        # use the passed system context if it exists, otherwise use the default
+        if system_context is None:
+            system_context = """You are an assistant who describes the content and composition of images. 
+            Describe only what you see in the image, not what you think the image is about.Be factual and literal. 
+            Do not use metaphors or similes. Be concise.
+            """
+
+        print('System Context: "{}"'.format(system_context))
         
         print(run_mode)
         
