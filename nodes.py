@@ -3,6 +3,7 @@ from ollama import Client
 from tqdm import tqdm
 from PIL import Image
 from io import BytesIO
+import base64
 
 class LlavaDescriber:
     def __init__(self):
@@ -12,10 +13,6 @@ class LlavaDescriber:
     def INPUT_TYPES(s):
         return {
             "optional": {
-              "run_mode": (["Local (Ollama)", "API (Ollama)"],),
-              "api_host": ("STRING", {
-                  "default": "http://localhost:11434"
-              }),
               'system_context': ("STRING", {
                   "forceInput": True
               }),
@@ -23,9 +20,8 @@ class LlavaDescriber:
             "required": {
                 "image": ("IMAGE",),  
                 "model": (["llava:7b-v1.6", "llava:13b-v1.6", "llava:34b-v1.6"],),
-                "prompt": ("STRING", {
-                    "default": "Return a list of danbooru tags for this image, formatted as lowercase, separated by commas.",
-                    "multiline": True
+                "api_host": ("STRING", {
+                  "default": "http://localhost:11434"
                 }),
                 "temperature": ("FLOAT", {
                     "min": 0,
@@ -33,10 +29,24 @@ class LlavaDescriber:
                     "step": 0.1,
                     "default": 0.2
                 }),
+                "seed_number": ("INT", {
+                    "min": -1,
+                    "max": 0xffffffffffffffff,
+                    "step": 1,
+                    "default": 0
+                }),
                 "max_tokens": ("INT", {
                     "step": 10,
                     "default": 200
                 }),
+                "keep_model_alive": ("INT", {
+                    "step": 1,
+                    "default": -1
+                }),
+                "prompt": ("STRING", {
+                    "default": "Return a list of danbooru tags for this image, formatted as lowercase, separated by commas.",
+                    "multiline": True
+                })
             },
         }
 
@@ -57,6 +67,12 @@ class LlavaDescriber:
         image = Image.fromarray(image_np, mode='RGB')
         return image
     
+    def image_to_bytes(self, image: Image.Image):
+        with BytesIO() as output:
+            image.save(output, format="PNG")
+            image_bytes = output.getvalue()
+        return image_bytes
+
     def pull_model(self, model, client):
         current_digest, bars = '', {}
         for progress in client.pull(model, stream=True):
@@ -77,16 +93,14 @@ class LlavaDescriber:
             current_digest = digest
   
   
-    def process_image(self, image, model, prompt, temperature, max_tokens, run_mode, api_host, system_context=None):
+    def process_image(self, image, model, api_host, temperature, seed_number, max_tokens, keep_model_alive, prompt, system_context=None):
         print('Converting Tensor to Image')
         img = self.tensor_to_image(image)
         
-        print('Converting Image to Bytes')
-        with BytesIO() as buffer:
-            img.save(buffer, format="PNG")
-            image_bytes = buffer.getvalue()
+        print('Converting Image to bytes')
+        img_bytes = self.image_to_bytes(img)
         
-        print('Generating Annotation from Image')
+        print('Generating Description from Image')
         full_response = ""
 
         # use the passed system context if it exists, otherwise use the default
@@ -98,30 +112,18 @@ class LlavaDescriber:
 
         print('System Context: "{}"'.format(system_context))
         
-        print(run_mode)
+        client = Client(api_host, timeout=30)
+        models = [model_l['name'] for model_l in client.list()['models']]
         
-        if run_mode == "Local (Ollama)":
-            models = [model_l['name'] for model_l in ollama.list()['models']]
-             
-            if model not in models:
-                self.pull_model(model, ollama)
-                
-            full_response = ollama.generate(model=model, system=system_context, prompt=prompt, images=[image_bytes], stream=False, keep_alive=0, options={
-                 'num_predict': max_tokens,
-                 'temperature': temperature,
-            })
-        else:
-            client = Client(api_host, timeout=30)
-            models = [model_l['name'] for model_l in client.list()['models']]
+        if model not in models:
+            self.pull_model(model, client)
             
-            if model not in models:
-                self.pull_model(model, client)
-                
-            full_response = client.generate(model=model, system=system_context, prompt=prompt, images=[image_bytes], stream=False, options={
-                 'num_predict': max_tokens,
-                 'temperature': temperature,
-            })
-            
+        full_response = client.generate(model=model, system=system_context, prompt=prompt, images=[img_bytes], keep_alive=keep_model_alive, stream=False, options={
+                'num_predict': max_tokens,
+                'temperature': temperature,
+                'seed': seed_number
+        })
+        
         print('Finalizing')
         return (full_response['response'], )
 
@@ -141,5 +143,5 @@ NODE_CLASS_MAPPINGS = {
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "LLaVaDescriber": "🌋 LLaVa Describer by Alisson 🦙"
+    "LLaVaDescriber": "🌋 LLaVa Describer 🦙"
 }
