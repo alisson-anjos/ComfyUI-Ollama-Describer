@@ -99,7 +99,7 @@ class LlavaDescriber:
             if model not in models:
                 self.pull_model(model, ollama)
                 
-            full_response = ollama.generate(model=model, system=system_context, prompt=prompt, images=[image_bytes], stream=False, options={
+            full_response = ollama.generate(model=model, system=system_context, prompt=prompt, images=[image_bytes], stream=False, keep_alive=0, options={
                  'num_predict': max_tokens,
                  'temperature': temperature,
             })
