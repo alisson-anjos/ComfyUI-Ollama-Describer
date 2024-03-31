@@ -112,7 +112,7 @@ class LlavaDescriber:
 
         print('System Context: "{}"'.format(system_context))
         
-        client = Client(api_host, timeout=30)
+        client = Client(api_host, timeout=300)
         models = [model_l['name'] for model_l in client.list()['models']]
         
         if model not in models:
