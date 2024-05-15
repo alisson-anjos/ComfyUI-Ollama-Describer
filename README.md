@@ -1,4 +1,4 @@
-# ComfyUI-LLaVA-Describer
+# ComfyUI-Ollama-Describer
 
 This is an extension for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) to extract descriptions from your images using the multimodal model called LLaVa. The LLaVa model - Large Language and Vision Assistant, although trained on a relatively small dataset, demonstrates exceptional capabilities in understanding images and answering questions about them. This model shows behaviors similar to multimodal models like GPT-4, even when presented with unseen images and instructions.
 
@@ -37,7 +37,7 @@ Follow the guide on the Ollama website and install according to your operating s
 After installing Ollama and getting it running, you can use the extension in your ComfyUI.
 
 ## Usage
-Add the node via `image` -> `LlaVa Describer`  
+Add the node via `Ollama` -> `LlaVa Describer`  
 - **model**: Select one of the models, 7b, 13b or 34b, the greater the number of parameters in the selected model the longer it will take to execute the prompt and return the response, use according to the capabilities of your hardware, I advise using 13b.
 - **api_host**: With this parameter you can specify the address of the API used to communicate with the model, you can use it locally (localhost..) or remotely. Remembering that to run ollama locally, it must be running on your machine.
 - **temperature**: The higher this value, or closer to 1, the more creative/random the answer will be. In other words, the model may not follow the instructions added in your prompt or even add false information, the LLaVa model provides good answers with temperatures from 0.2 and below.
