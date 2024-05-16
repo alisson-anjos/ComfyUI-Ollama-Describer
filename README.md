@@ -26,9 +26,9 @@ Follow the guide on the Ollama website and install according to your operating s
 
 2. Clone the repository into your `custom_nodes` folder:
     ```bash
-    git clone https://github.com/alisson-anjos/ComfyUI-LLaVA-Describer.git
+    git clone https://github.com/alisson-anjos/ComfyUI-Ollama-Describer.git
     ```
-   The path should be something like `custom_nodes\ComfyUI-LLaVA-Describer`.
+   The path should be something like `custom_nodes\ComfyUI-Ollama-Describer`.
    
 3. Open the folder and execute `install.bat` (Windows) or open a terminal in the folder and run:
     ```bash
