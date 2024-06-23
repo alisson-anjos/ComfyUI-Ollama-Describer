@@ -47,6 +47,7 @@ class OllamaImageDescriber:
     
     @classmethod
     def INPUT_TYPES(s):
+        
         return {
             "required": {
                 "model": (["llava:7b-v1.6 (Q4_0, 4.7GB)", 
@@ -55,7 +56,7 @@ class OllamaImageDescriber:
                            "llava-llama3:8b (Q4_K_M, 5.5GB)", 
                            "llava-phi3:3.8b (Q4_K_M, 2.9GB)", 
                            "moondream:1.8b (Q4, 1.7GB)", 
-                           "moondream:1.8b-v2-q6_K (Q6, 2.1GB)"
+                           "moondream:1.8b-v2-q6_K (Q6, 2.1GB)",
                            "moondream:1.8b-v2-fp16 (F16, 3.7GB)"],),
                 "custom_model": ("STRING", {
                     "default": ""
@@ -282,7 +283,9 @@ class TextTransformer:
         return {
             "required": {
                 "text": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
-                 "prepend_text": ("STRING", {
+            },
+             "optional": {
+                "prepend_text": ("STRING", {
                     "multiline": True,
                     "default": "",
                 }),
@@ -305,13 +308,27 @@ class TextTransformer:
     FUNCTION = "transform_text"
     CATEGORY = "Ollama"
 
+    def unescape_string(self, s):
+        return (s.replace("\\n", "\n")
+                .replace("\\t", "\t")
+                .replace("\\r", "\r")
+                .replace("\\b", "\b")
+                .replace("\\f", "\f")
+                .replace("\\v", "\v")
+                .replace("\\\\", "\\")
+                .replace("\\'", "'")
+                .replace('\\"', '"')
+                .replace("\\a", "\a"))
+
     def transform_text(self, text, prepend_text="", append_text="", replace_find_mode="normal", replace_find="", replace_with=""):
 
+        text = self.unescape_string(text)
+        
         if prepend_text:
-            text = prepend_text + text
+            text = self.unescape_string(prepend_text) + text
         
         if append_text:
-            text = text + append_text
+            text = text + self.unescape_string(append_text)
 
         if replace_find_mode == "normal":
             if replace_find:
