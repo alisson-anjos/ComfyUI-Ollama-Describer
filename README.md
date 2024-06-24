@@ -44,7 +44,7 @@ Add the node via `Ollama` -> `Ollama Image Describer`
 ![alt text](image-2.png)
 
 - **model**: Select one of the models, 7b, 13b or 34b, the greater the number of parameters in the selected model the longer it will take to execute the prompt and return the response, use according to the capabilities of your hardware. For most users, I recommend using the 7b/13b model as it offers a good balance between performance and resource requirements.
-- **custom_model**: it is possible to use a model that is not in the model list, to do this you need to consult the models available on the [ollama website](https://ollama.com/library) and get the name of the model and put it in this field for example: moondream:1.8b
+- **custom_model**: it is possible to use a model that is not in the model list, to do this you need to consult the models available on the [ollama website](https://ollama.com/library) and get the name of the model (Here it is important to use a model that supports vision, because otherwise the image used will not have any impact) and put it in this field for example: moondream:1.8b 
 - **api_host**: With this parameter you can specify the address of the API used to communicate with the model, you can use it locally (localhost..) or remotely. Remembering that to run ollama locally, it must be running on your machine.
 - **timeout**: With this parameter you can specify the maximum response time, if the time exceeds this value the request will be cancelled.
 - **temperature**: The higher this value, or closer to 1, the more creative/random the answer will be. In other words, the model may not follow the instructions added in your prompt or even add false information, the LLaVa model provides good answers with temperatures from 0.2 and below.
