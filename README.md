@@ -36,7 +36,7 @@ After installing Ollama and getting it running, you can use the extension in you
 
 ## Usage
 
-You can find an example workflow [here]().
+You can find an example workflow [here](workflow.json).
 
 ### Ollama Image Describer
 Add the node via `Ollama` -> `Ollama Image Describer`  
