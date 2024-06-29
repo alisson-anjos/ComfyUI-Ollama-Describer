@@ -2,7 +2,31 @@ from ollama import Client
 from tqdm import tqdm
 from PIL import Image
 from io import BytesIO
+import base64
 import re
+
+vision_models = ["llava:7b-v1.6-vicuna-q2_K (Q2_K, 3.2GB)",
+                 "llava:7b-v1.6-mistral-q2_K (Q2_K, 3.3GB)",
+                 "llava:7b-v1.6 (Q4_0, 4.7GB)", 
+                 "llava:13b-v1.6 (Q4_0, 8.0GB)", 
+                 "llava:34b-v1.6 (Q4_0, 20.0GB)", 
+                 "llava-llama3:8b (Q4_K_M, 5.5GB)", 
+                 "llava-phi3:3.8b (Q4_K_M, 2.9GB)", 
+                 "moondream:1.8b (Q4, 1.7GB)", 
+                 "moondream:1.8b-v2-q6_K (Q6, 2.1GB)",
+                 "moondream:1.8b-v2-fp16 (F16, 3.7GB)"]
+
+text_models = ["qwen2:0.5b (Q4_0, 352MB)",
+                           "qwen2:1.5b (Q4_0, 935MB)",
+                           "qwen2:7b (Q4_0, 4.4GB)",
+                           "gemma:2b (Q4_0, 1.7GB)", 
+                           "gemma:7b (Q4_0, 5.0GB)",
+                           "gemma2:9b (Q4_0, 5.4GB)", 
+                           "llama2:7b (Q4_0, 3.8GB)", 
+                           "llama2:13b (Q4_0, 7.4GB)", 
+                           "llama3:8b (Q4_0, 4.7GB)", 
+                           "llama3:8b-text-q6_K (Q6_K, 6.6GB)",
+                           "mistral:7b (Q4_0, 4.1GB)"]
 
 class OllamaUtil:
     def __init__(self):
@@ -21,6 +45,14 @@ class OllamaUtil:
             image.save(output, format="PNG")
             image_bytes = output.getvalue()
         return image_bytes
+    
+    def image_to_base64(self, image: Image.Image):
+        with BytesIO() as output:
+            image.save(output, format="PNG")
+            image_bytes = output.getvalue()
+            image_base64 = base64.b64encode(image_bytes)
+        return image_base64
+    
 
     def pull_model(self, model, client):
         current_digest, bars = '', {}
@@ -40,7 +72,7 @@ class OllamaUtil:
                 bars[digest].update(completed - bars[digest].n)
 
             current_digest = digest
-            
+                
 class OllamaImageDescriber:
     def __init__(self):
         pass
@@ -50,14 +82,7 @@ class OllamaImageDescriber:
         
         return {
             "required": {
-                "model": (["llava:7b-v1.6 (Q4_0, 4.7GB)", 
-                           "llava:13b-v1.6 (Q4_0, 8.0GB)", 
-                           "llava:34b-v1.6 (Q4_0, 20.0GB)", 
-                           "llava-llama3:8b (Q4_K_M, 5.5GB)", 
-                           "llava-phi3:3.8b (Q4_K_M, 2.9GB)", 
-                           "moondream:1.8b (Q4, 1.7GB)", 
-                           "moondream:1.8b-v2-q6_K (Q6, 2.1GB)",
-                           "moondream:1.8b-v2-fp16 (F16, 3.7GB)"],),
+                "model": (vision_models,),
                 "custom_model": ("STRING", {
                     "default": ""
                 }),
@@ -72,9 +97,27 @@ class OllamaImageDescriber:
                 }),
                 "temperature": ("FLOAT", {
                     "min": 0,
-                    "max": 1,
+                    "max": 10,
                     "step": 0.1,
                     "default": 0.2
+                }),
+                "top_k": ("INT", {
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "default": 40
+                }),
+                "top_p": ("FLOAT", {
+                    "min": 0,
+                    "max": 10,
+                    "step": 0.1,
+                    "default": 0.9
+                }),
+                "repeat_penalty":("FLOAT", {
+                    "min": 0,
+                    "max": 10,
+                    "step": 0.1,
+                    "default": 1.1
                 }),
                 "seed_number": ("INT", {
                     "min": -1,
@@ -92,7 +135,7 @@ class OllamaImageDescriber:
                     "step": 1,
                     "default": -1
                 }),
-                "image": ("IMAGE",),  
+                "images": ("IMAGE",),  
                 "system_context": ("STRING", {
                     "multiline": True,
                     "default": """You are an assistant who describes the content and composition of images. 
@@ -117,7 +160,21 @@ Be concise.""",
 
     CATEGORY = "Ollama"
 
-    def ollama_image_describe(self, model, custom_model, api_host, timeout, temperature, seed_number, max_tokens, keep_model_alive, prompt, system_context, image):
+    def ollama_image_describe(self, 
+                              model, 
+                              custom_model, 
+                              api_host,
+                              timeout,
+                              temperature,
+                              top_k,
+                              top_p,
+                              repeat_penalty, 
+                              seed_number,
+                              max_tokens,
+                              keep_model_alive,
+                              prompt,
+                              system_context,
+                              images):
         
         client = Client(api_host, timeout=timeout)
         
@@ -138,17 +195,23 @@ Be concise.""",
         print('Prompt: "{}"'.format(prompt))
         
         full_response = ""
-                
-        print('Converting Tensor to Image')
-        img = ollama_util.tensor_to_image(image)
-    
-        print('Converting Image to bytes')
-        img_bytes = ollama_util.image_to_bytes(img)
-    
+        
+        images_base64 = []       
+        
+        for (batch_number, image) in enumerate(images):
+            print('Converting Tensor to Image')
+            img = ollama_util.tensor_to_image(image)
+            print('Converting Image to bytes')
+            img_base64 = ollama_util.image_to_base64(img)
+            images_base64.append(str(img_base64, 'utf-8'))
+            
         print('Generating Description from Image')
-        full_response =  client.generate(model=model, system=system_context, prompt=prompt, images=[img_bytes], keep_alive=keep_model_alive, stream=False, options={
+        full_response =  client.generate(model=model, system=system_context, prompt=prompt, images=images_base64, keep_alive=keep_model_alive, stream=False, options={
                 'num_predict': max_tokens,
                 'temperature': temperature,
+                'top_k': top_k,
+                'top_p': top_p,
+                'repeat_penalty': repeat_penalty, 
                 'seed': seed_number
         })
         
@@ -156,6 +219,9 @@ Be concise.""",
         
         print('Finalized')
         return (result, )
+
+
+
 
 class OllamaTextDescriber:
     
@@ -166,16 +232,7 @@ class OllamaTextDescriber:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "model": (["qwen2:0.5b (Q4_0, 352MB)",
-                           "qwen2:1.5b (Q4_0, 935MB)",
-                           "qwen2:7b (Q4_0, 4.4GB)",
-                           "gemma:2b (Q4_0, 1.7GB)", 
-                           "gemma:7b (Q4_0, 5.0GB)",
-                           "llama2:7b (Q4_0, 3.8GB)", 
-                           "llama2:13b (Q4_0, 7.4GB)", 
-                           "llama3:8b (Q4_0, 4.7GB)", 
-                           "llama3:8b-text-q6_K (Q6_K, 6.6GB)",
-                           "mistral:7b (Q4_0, 4.1GB)"],),
+                "model": (text_models,),
                 "custom_model": ("STRING", {
                     "default": ""
                 }),
@@ -193,6 +250,24 @@ class OllamaTextDescriber:
                     "max": 1,
                     "step": 0.1,
                     "default": 0.2
+                }),
+                "top_k": ("INT", {
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "default": 40
+                }),
+                "top_p": ("FLOAT", {
+                    "min": 0,
+                    "max": 10,
+                    "step": 0.1,
+                    "default": 0.9
+                }),
+                "repeat_penalty": ("FLOAT", {
+                    "min": 0,
+                    "max": 10,
+                    "step": 0.1,
+                    "default": 1.1
                 }),
                 "seed_number": ("INT", {
                     "min": -1,
@@ -242,7 +317,21 @@ Now, extract the tags from the following text: """,
 
     CATEGORY = "Ollama"
 
-    def ollama_text_describe(self, model, custom_model, api_host, timeout, temperature, seed_number, max_tokens, keep_model_alive, prompt, system_context):
+    def ollama_text_describe(self, 
+                             model, 
+                             custom_model, 
+                             api_host, 
+                             timeout, 
+                             temperature,
+                             top_k,
+                             top_p,
+                             repeat_penalty, 
+                             seed_number, 
+                             max_tokens, 
+                             keep_model_alive, 
+                             prompt, 
+                             system_context):
+        
         client = Client(api_host, timeout=timeout)
         ollama_util = OllamaUtil()
         
@@ -266,11 +355,16 @@ Now, extract the tags from the following text: """,
         full_response =  client.generate(model=model, system=system_context, prompt=prompt, keep_alive=keep_model_alive, stream=False, options={
                 'num_predict': max_tokens,
                 'temperature': temperature,
+                'top_k': top_k,
+                'top_p': top_p,
+                'repeat_penalty': repeat_penalty, 
                 'seed': seed_number
         })
         
+        result = full_response['response']
+        
         print('Finalized')
-        return (full_response['response'], )
+        return (result, )
     
     #@classmethod
     #def IS_CHANGED(s, image, string_field, int_field, float_field, print_to_screen):
