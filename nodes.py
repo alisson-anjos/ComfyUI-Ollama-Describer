@@ -22,6 +22,8 @@ text_models = ["qwen2:0.5b (Q4_0, 352MB)",
                            "gemma:2b (Q4_0, 1.7GB)", 
                            "gemma:7b (Q4_0, 5.0GB)",
                            "gemma2:9b (Q4_0, 5.4GB)", 
+                           "phi3:mini (3.82b, Q4_0, 2.2GB)",
+                           "phi3:medium (14b, Q4_0, 7.9GB)",
                            "llama2:7b (Q4_0, 3.8GB)", 
                            "llama2:13b (Q4_0, 7.4GB)", 
                            "llama3:8b (Q4_0, 4.7GB)", 
@@ -204,6 +206,8 @@ Be concise.""",
             print('Converting Image to bytes')
             img_base64 = ollama_util.image_to_base64(img)
             images_base64.append(str(img_base64, 'utf-8'))
+        
+            
             
         print('Generating Description from Image')
         full_response =  client.generate(model=model, system=system_context, prompt=prompt, images=images_base64, keep_alive=keep_model_alive, stream=False, options={
@@ -212,7 +216,9 @@ Be concise.""",
                 'top_k': top_k,
                 'top_p': top_p,
                 'repeat_penalty': repeat_penalty, 
-                'seed': seed_number
+                'seed': seed_number,
+                'main_gpu': 0,
+                'low_vram': False,
         })
         
         result = full_response['response']
