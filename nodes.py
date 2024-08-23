@@ -28,6 +28,8 @@ text_models = ["qwen2:0.5b (Q4_0, 352MB)",
                            "llama2:13b (Q4_0, 7.4GB)", 
                            "llama3:8b (Q4_0, 4.7GB)", 
                            "llama3:8b-text-q6_K (Q6_K, 6.6GB)",
+                           "llama3.1:8b (Q4_0, 4.7GB)",
+                           "llama3.1:8b-instruct-q4_0 (Q4_0, 4.7GB)",
                            "mistral:7b (Q4_0, 4.1GB)"]
 
 class OllamaUtil:
