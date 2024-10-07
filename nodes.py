@@ -17,20 +17,31 @@ vision_models = ["llava:7b-v1.6-vicuna-q2_K (Q2_K, 3.2GB)",
                  "moondream:1.8b-v2-fp16 (F16, 3.7GB)"]
 
 text_models = ["qwen2:0.5b (Q4_0, 352MB)",
-                           "qwen2:1.5b (Q4_0, 935MB)",
-                           "qwen2:7b (Q4_0, 4.4GB)",
-                           "gemma:2b (Q4_0, 1.7GB)", 
-                           "gemma:7b (Q4_0, 5.0GB)",
-                           "gemma2:9b (Q4_0, 5.4GB)", 
-                           "phi3:mini (3.82b, Q4_0, 2.2GB)",
-                           "phi3:medium (14b, Q4_0, 7.9GB)",
-                           "llama2:7b (Q4_0, 3.8GB)", 
-                           "llama2:13b (Q4_0, 7.4GB)", 
-                           "llama3:8b (Q4_0, 4.7GB)", 
-                           "llama3:8b-text-q6_K (Q6_K, 6.6GB)",
-                           "llama3.1:8b (Q4_0, 4.7GB)",
-                           "llama3.1:8b-instruct-q4_0 (Q4_0, 4.7GB)",
-                           "mistral:7b (Q4_0, 4.1GB)"]
+               "qwen2.5:0.5b-instruct (Q4_K_M, 398MB)",
+               "qwen2:1.5b (Q4_0, 935MB)",
+               "qwen2.5:1.5b-instruct (Q4_K_M, 986MB)",
+               "qwen2.5:7b (Q4_K_M, 4.7GB)",
+               "qwen2.5:7b-instruct (Q4_K_M, 4.7GB)",
+                "qwen2:7b (Q4_0, 4.4GB)",
+                "gemma:2b (Q4_0, 1.7GB)", 
+                "gemma:7b (Q4_0, 5.0GB)",
+                "gemma2:9b (Q4_0, 5.4GB)", 
+                "phi3:mini (3.82b, Q4_0, 2.2GB)",
+                "phi3:medium (14b, Q4_0, 7.9GB)",
+                "llama2:7b (Q4_0, 3.8GB)", 
+                "llama2:13b (Q4_0, 7.4GB)", 
+                "llama3:8b (Q4_0, 4.7GB)", 
+                "llama3:8b-text-q6_K (Q6_K, 6.6GB)",
+                "llama3.1:8b (Q4_0, 4.7GB)",
+                "llama3.1:8b-instruct-q4_0 (Q4_0, 4.7GB)",
+                "llama3.1:8b-instruct-q8_0 (Q8_0, 8.5GB)",
+                "llama3.2:1b (Q8_0, 1.3GB)",
+                "llama3.2:1b-instruct-fp16 (F16, 2.5GB)",
+                "llama3.2:1b-instruct-q8_0 (Q8_0, 1.3GB)",
+                "llama3.2:3b (Q4_K_M, 2.0GB)",
+                "llama3.2:3b-instruct-q4_0 (Q4_0, 1.9GB)",
+                "llama3.2:3b-instruct-q8_0 (Q8_0, 3.4GB)",
+                "mistral:7b (Q4_0, 4.1GB)"]
 
 class OllamaUtil:
     def __init__(self):
@@ -129,6 +140,10 @@ class OllamaImageDescriber:
                     "step": 1,
                     "default": 42
                 }),
+                "num_ctx": ("INT", {
+                    "step": 64,
+                    "default": 2048
+                }),
                 "max_tokens": ("INT", {
                     "step": 10,
                     "default": 200
@@ -174,6 +189,7 @@ Be concise.""",
                               top_p,
                               repeat_penalty, 
                               seed_number,
+                              num_ctx,
                               max_tokens,
                               keep_model_alive,
                               prompt,
@@ -213,6 +229,7 @@ Be concise.""",
             
         print('Generating Description from Image')
         full_response =  client.generate(model=model, system=system_context, prompt=prompt, images=images_base64, keep_alive=keep_model_alive, stream=False, options={
+                'num_ctx': num_ctx,
                 'num_predict': max_tokens,
                 'temperature': temperature,
                 'top_k': top_k,
@@ -283,6 +300,10 @@ class OllamaTextDescriber:
                     "step": 1,
                     "default": 42
                 }),
+                 "num_ctx": ("INT", {
+                    "step": 64,
+                    "default": 2048
+                }),
                 "max_tokens": ("INT", {
                     "step": 10,
                     "default": 200
@@ -335,6 +356,7 @@ Now, extract the tags from the following text: """,
                              top_p,
                              repeat_penalty, 
                              seed_number, 
+                             num_ctx,
                              max_tokens, 
                              keep_model_alive, 
                              prompt, 
@@ -361,6 +383,7 @@ Now, extract the tags from the following text: """,
                 
         print('Generating Response')
         full_response =  client.generate(model=model, system=system_context, prompt=prompt, keep_alive=keep_model_alive, stream=False, options={
+                'num_ctx': num_ctx,
                 'num_predict': max_tokens,
                 'temperature': temperature,
                 'top_k': top_k,
