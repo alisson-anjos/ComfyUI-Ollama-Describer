@@ -111,7 +111,7 @@ class OllamaImageCaptioner:
                 }),
                 "input_dir": ("STRING", {"default": ""}),
                 "output_dir": ("STRING", {"default": ""}),
-                "max_images": ("INT", { "default": -1 }),
+                "max_images": ("INT", { "min": -1, "default": -1 }),
                 "low_vram": ("BOOLEAN", { "default": False }),
                 "keep_model_alive": ("INT", {
                     "min": -1,
