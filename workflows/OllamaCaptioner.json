@@ -1,0 +1,202 @@
+{
+  "last_node_id": 5,
+  "last_link_id": 3,
+  "nodes": [
+    {
+      "id": 5,
+      "type": "Note",
+      "pos": {
+        "0": 1110,
+        "1": 120
+      },
+      "size": [
+        372.7138900668906,
+        65.00821287206372
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "put the path to the images folder in input_dir"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 3,
+      "type": "OllamaCaptionerExtraOptions",
+      "pos": {
+        "0": 180,
+        "1": 250
+      },
+      "size": [
+        824.2591375747395,
+        444.34656308281313
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "Extra_Options",
+          "type": "Extra_Options",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "OllamaCaptionerExtraOptions"
+      },
+      "widgets_values": [
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": 4,
+      "type": "OllamaImageCaptioner",
+      "pos": {
+        "0": 1090,
+        "1": 280
+      },
+      "size": {
+        "0": 352.79998779296875,
+        "1": 442
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "extra_options",
+          "type": "Extra_Options",
+          "link": 3,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "OllamaImageCaptioner"
+      },
+      "widgets_values": [
+        "llama3.2-vision:11b (Q4_K_M, 7.9GB)",
+        "",
+        "http://localhost:11434",
+        300,
+        "C:\\Users\\Alisson\\Downloads\\TestOllama",
+        "",
+        1,
+        false,
+        -1,
+        0.9,
+        0.6,
+        "FLUX/SD3+",
+        "medium-length",
+        "M1CJ4K",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 2,
+      "type": "ShowText|pysssss",
+      "pos": {
+        "0": 1551,
+        "1": 288
+      },
+      "size": {
+        "0": 315,
+        "1": 76
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 2,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "",
+        "result: finished count: 1, error count: 0"
+      ]
+    }
+  ],
+  "links": [
+    [
+      2,
+      4,
+      0,
+      2,
+      0,
+      "STRING"
+    ],
+    [
+      3,
+      3,
+      0,
+      4,
+      0,
+      "Extra_Options"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.922959981770674,
+      "offset": [
+        -482.8128806003756,
+        68.71214942585198
+      ]
+    }
+  },
+  "version": 0.4
+}

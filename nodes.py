@@ -4,44 +4,17 @@ from PIL import Image
 from io import BytesIO
 import base64
 import re
+import os
+import comfy.model_management
+import comfy.utils
+import folder_paths
+from .config import configurations
 
-vision_models = ["llava:7b-v1.6-vicuna-q2_K (Q2_K, 3.2GB)",
-                 "llava:7b-v1.6-mistral-q2_K (Q2_K, 3.3GB)",
-                 "llava:7b-v1.6 (Q4_0, 4.7GB)", 
-                 "llava:13b-v1.6 (Q4_0, 8.0GB)", 
-                 "llava:34b-v1.6 (Q4_0, 20.0GB)", 
-                 "llava-llama3:8b (Q4_K_M, 5.5GB)", 
-                 "llava-phi3:3.8b (Q4_K_M, 2.9GB)", 
-                 "moondream:1.8b (Q4, 1.7GB)", 
-                 "moondream:1.8b-v2-q6_K (Q6, 2.1GB)",
-                 "moondream:1.8b-v2-fp16 (F16, 3.7GB)"]
-
-text_models = ["qwen2:0.5b (Q4_0, 352MB)",
-               "qwen2.5:0.5b-instruct (Q4_K_M, 398MB)",
-               "qwen2:1.5b (Q4_0, 935MB)",
-               "qwen2.5:1.5b-instruct (Q4_K_M, 986MB)",
-               "qwen2.5:7b (Q4_K_M, 4.7GB)",
-               "qwen2.5:7b-instruct (Q4_K_M, 4.7GB)",
-                "qwen2:7b (Q4_0, 4.4GB)",
-                "gemma:2b (Q4_0, 1.7GB)", 
-                "gemma:7b (Q4_0, 5.0GB)",
-                "gemma2:9b (Q4_0, 5.4GB)", 
-                "phi3:mini (3.82b, Q4_0, 2.2GB)",
-                "phi3:medium (14b, Q4_0, 7.9GB)",
-                "llama2:7b (Q4_0, 3.8GB)", 
-                "llama2:13b (Q4_0, 7.4GB)", 
-                "llama3:8b (Q4_0, 4.7GB)", 
-                "llama3:8b-text-q6_K (Q6_K, 6.6GB)",
-                "llama3.1:8b (Q4_0, 4.7GB)",
-                "llama3.1:8b-instruct-q4_0 (Q4_0, 4.7GB)",
-                "llama3.1:8b-instruct-q8_0 (Q8_0, 8.5GB)",
-                "llama3.2:1b (Q8_0, 1.3GB)",
-                "llama3.2:1b-instruct-fp16 (F16, 2.5GB)",
-                "llama3.2:1b-instruct-q8_0 (Q8_0, 1.3GB)",
-                "llama3.2:3b (Q4_K_M, 2.0GB)",
-                "llama3.2:3b-instruct-q4_0 (Q4_0, 1.9GB)",
-                "llama3.2:3b-instruct-q8_0 (Q8_0, 3.4GB)",
-                "mistral:7b (Q4_0, 4.1GB)"]
+multimodal_models = list(configurations["multimodal_models"])
+text_models = list(configurations["text_models"])
+caption_types = list(configurations["caption_types"].keys())
+caption_lengths = list(configurations["caption_lengths"])
+extra_options = list(configurations["extra_options"])
 
 class OllamaUtil:
     def __init__(self):
@@ -87,7 +60,191 @@ class OllamaUtil:
                 bars[digest].update(completed - bars[digest].n)
 
             current_digest = digest
+           
+class OllamaCaptionerExtraOptions:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        options = extra_options
+        required = {}
+        for option in options:
+            required[option] = ("BOOLEAN", {"default": False})
+        return {
+            "required": required
+        }
+
+    CATEGORY = "Ollama"
+    RETURN_TYPES = ("Extra_Options",)
+    FUNCTION = "run"
+
+    def run(self, **kwargs):
+        options_selected = list(kwargs.values())
+        options = extra_options
+        values = []
+        for selected, option in zip(options_selected, options):
+            if selected:
+                values.append(option)
+        return (values, )
+            
+class OllamaImageCaptioner:
+    def __init__(self):
+        pass
+    
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "model": (multimodal_models,),
+                "custom_model": ("STRING", {
+                    "default": ""
+                }),
+                "api_host": ("STRING", {
+                  "default": "http://localhost:11434"
+                }),
+                "timeout": ("INT", {
+                    "min": 0,
+                    "max": 0xffffffffffffffff,
+                    "step": 1,
+                    "default": 300
+                }),
+                "input_dir": ("STRING", {"default": ""}),
+                "output_dir": ("STRING", {"default": ""}),
+                "max_images": ("INT", { "default": -1 }),
+                "low_vram": ("BOOLEAN", { "default": False }),
+                "keep_model_alive": ("INT", {
+                    "min": -1,
+                    "max": 0xffffffffffffffff,
+                    "step": 1,
+                    "default": -1
+                }),
+                "top_p": ("FLOAT", {"default": 0.9, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "temperature": ("FLOAT", {"default": 0.6, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "caption_type": (caption_types,),
+                "caption_length": (caption_lengths,),
+                "name": ("STRING", {"default": ""}),
+                "custom_prompt": ("STRING", {"default": ""}),
+                "prefix_caption": ("STRING", {"default": ""}),
+                "suffix_caption": ("STRING", {"default": ""}),
+            },
+            "optional": {
+                "extra_options": ("Extra_Options", ),
+            }
+        } 
+          
+    FUNCTION = "run_captioner"
+
+    OUTPUT_NODE = True
+    
+    RETURN_TYPES = ("STRING",)
+
+    CATEGORY = "Ollama"
+
+    def run_captioner(self, model, custom_model, api_host, timeout, low_vram, keep_model_alive, input_dir,output_dir, max_images,caption_type,caption_length,name, custom_prompt, top_p,temperature, prefix_caption, suffix_caption, extra_options=[]):
+        
+        client = Client(api_host, timeout=timeout)
+        
+        ollama_util = OllamaUtil()
+        
+        models = [model_l['name'] for model_l in client.list()['models']]
+        
+        model = model.split(' ')[0].strip()
+        custom_model = custom_model.strip()
+        
+        model = custom_model if custom_model != "" else model
+        
+        if model not in models:
+            print(f"Downloading model: {model}")
+            ollama_util.pull_model(model, client)
+        
+        length = None if caption_length == "any" else caption_length
+        if isinstance(length, str):
+            try:
+                length = int(length)
+            except ValueError:
+                pass
+        
+        # Build prompt
+        if length is None:
+            map_idx = 0
+        elif isinstance(length, int):
+            map_idx = 1
+        elif isinstance(length, str):
+            map_idx = 2
+        else:
+            raise ValueError(f"Invalid caption length: {length}")
+        
+        system_context = "You are a helpful image captioner."
+        
+        caption_type_map = configurations["caption_types"]
+        prompt_str = list(caption_type_map[caption_type])[map_idx]
+        
+            # Add extra options
+        if len(extra_options) > 0:
+            prompt_str += " " + " ".join(extra_options)
+        
+        prompt_str = prompt_str.format(name=name, length=caption_length, word_count=caption_length)
+        
+        print('System Context: "{}"'.format(system_context))
+        print('Prompt: "{}"'.format(prompt_str))
+        
+        if output_dir is None or output_dir.strip() == "":
+            output_dir = input_dir
+
+        finished_image_count = 0
+        error_image_count = 0
+        image_count = 0
+        
+        for filename in os.listdir(input_dir):
+            if filename.lower().endswith((".jpg", ".png", ".jpeg", ".bmp", ".webp")) & (max_images == -1 or image_count < max_images):
+                image_count += 1
+        
+        pbar = comfy.utils.ProgressBar(image_count)
+        step = 0
+        for filename in os.listdir(input_dir):
+            if filename.lower().endswith((".jpg", ".png", ".jpeg", ".bmp", ".webp")) & (max_images == -1 or step < max_images):
+                image_path = os.path.join(input_dir, filename)
+                text_path = os.path.join(output_dir, os.path.splitext(filename)[0] + '.txt')
+
+                try:
+                    print(f"Processing: {image_path}")
+                    with Image.open(image_path) as img:
+                        if img.mode == 'RGBA':
+                            img = img.convert('RGB')
+                        pbar.update_absolute(step, image_count)
+                        image = img.resize((384, 384), Image.LANCZOS)
+                        
+                        print('Converting Image to base64')
+                        image_base64 = ollama_util.image_to_base64(image)
+                        image_base64 = [str(image_base64, 'utf-8')]
+                        
+                        print('Generating Description from Image')
+                        full_response =  client.generate(model=model, system=system_context, prompt=prompt_str, images=image_base64, keep_alive=keep_model_alive, stream=False, options={
+                                'temperature': temperature,
+                                'top_p': top_p,
+                                'main_gpu': 0,
+                                'low_vram': low_vram,
+                        })
+        
+                        caption = full_response['response']
+                        
+                        if prefix_caption:
+                            caption = f"{prefix_caption} {caption}"
+                        if suffix_caption:
+                            caption = f"{caption} {suffix_caption}"
+        
+                        with open(text_path, 'w', encoding='utf-8') as f:
+                            f.write(caption)
+                    finished_image_count += 1
+                except Exception as e:
+                    print(f"Error processing {filename} :{e}")
+                    error_image_count += 1
+                step += 1
                 
+        return (f"result: finished count: {finished_image_count}, error count: {error_image_count}", )
+
+            
 class OllamaImageDescriber:
     def __init__(self):
         pass
@@ -97,7 +254,7 @@ class OllamaImageDescriber:
         
         return {
             "required": {
-                "model": (vision_models,),
+                "model": (multimodal_models,),
                 "custom_model": ("STRING", {
                     "default": ""
                 }),
@@ -499,17 +656,21 @@ class InputText:
 # NOTE: names should be globally unique
 NODE_CLASS_MAPPINGS = {
     "OllamaImageDescriber": OllamaImageDescriber,
+    "OllamaImageCaptioner": OllamaImageCaptioner,
     "OllamaTextDescriber": OllamaTextDescriber,
     "TextTransformer": TextTransformer,
     "InputText": InputText,
+    "OllamaCaptionerExtraOptions": OllamaCaptionerExtraOptions
     # "ShowText": ShowText
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
 NODE_DISPLAY_NAME_MAPPINGS = {
     "OllamaImageDescriber": "🦙 Ollama Image Describer 🦙",
+    "OllamaImageCaptioner": "🦙 Ollama Image Captioner 🦙",
     "OllamaTextDescriber": "🦙 Ollama Text Describer 🦙",
     "TextTransformer": "📝 Text Transformer 📝",
     "InputText": "📝 Input Text (Multiline) 📝",
+    "OllamaCaptionerExtraOptions": "🦙 Ollama Captioner Extra Options 🦙"
     # "ShowText": "📝 Show Text 📝"
 }
