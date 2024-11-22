@@ -1,8 +1,13 @@
 # ComfyUI-Ollama-Describer
 
 This is an extension for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that makes it possible to use some LLM models provided by Ollama, such as Gemma, Llava (multimodal), Llama2, Llama3 or Mistral. 
+### Workflow Examples
+#### Ollama Image Describer + Ollama Text Describer
 
-![alt text](image.png)
+![Ollama Image Describer + Ollama Text Describer](image.png)
+
+#### Ollama Image Captioner
+![Ollama Image Captioner](captioner.png)
 
 ## Requirements
 
