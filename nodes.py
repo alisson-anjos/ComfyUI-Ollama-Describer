@@ -180,7 +180,11 @@ class OllamaImageCaptioner:
         caption_type_map = configurations["caption_types"]
         prompt_str = list(caption_type_map[caption_type])[map_idx]
         
-            # Add extra options
+        
+        if custom_prompt != "":
+            prompt_str += " " + custom_prompt
+            
+        # Add extra options
         if len(extra_options) > 0:
             prompt_str += " " + " ".join(extra_options)
         
