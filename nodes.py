@@ -20,6 +20,9 @@ class OllamaUtil:
     def __init__(self):
         pass
     
+    def __init__(self, client):
+        self.client = client
+    
     def tensor_to_image(self, tensor):
         tensor = tensor.cpu()
     
@@ -41,6 +44,11 @@ class OllamaUtil:
             image_base64 = base64.b64encode(image_bytes)
         return image_base64
     
+    def get_models(self):
+        try:
+            return [model_l['name'] for model_l in self.client.list()['models']]
+        except Exception as e:
+            return [model_l['model'] for model_l in self.client.list()['models']]
 
     def pull_model(self, model, client):
         current_digest, bars = '', {}
@@ -145,9 +153,9 @@ class OllamaImageCaptioner:
         
         client = Client(api_host, timeout=timeout)
         
-        ollama_util = OllamaUtil()
+        ollama_util = OllamaUtil(client)
         
-        models = [model_l['name'] for model_l in client.list()['models']]
+        models = ollama_util.get_models()
         
         model = model.split(' ')[0].strip()
         custom_model = custom_model.strip()
@@ -359,9 +367,9 @@ Be concise.""",
         
         client = Client(api_host, timeout=timeout)
         
-        ollama_util = OllamaUtil()
+        ollama_util = OllamaUtil(client)
         
-        models = [model_l['name'] for model_l in client.list()['models']]
+        models = ollama_util.get_models()
         
         model = model.split(' ')[0].strip()
         custom_model = custom_model.strip()
@@ -524,9 +532,9 @@ Now, extract the tags from the following text: """,
                              system_context):
         
         client = Client(api_host, timeout=timeout)
-        ollama_util = OllamaUtil()
+        ollama_util = OllamaUtil(client)
         
-        models = [model_l['name'] for model_l in client.list()['models']]
+        models = ollama_util.get_models()
         
         model = model.split(' ')[0].strip()
         custom_model = custom_model.strip()
