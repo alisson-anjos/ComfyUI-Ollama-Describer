@@ -1,4 +1,0 @@
-
-
-
-TILE = namedtuple("TILE", )
