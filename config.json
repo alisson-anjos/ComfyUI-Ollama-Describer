@@ -162,6 +162,12 @@
         "moondream:1.8b-v2-fp16 (F16, 3.7GB)"
     ],
     "text_models": [
+        "deepscaler:1.5b (F16, 3.6GB)",
+        "deepseek-r1:32b (Q4_K_M, 20.0GB)",
+        "deepseek-r1:14b (Q4_K_M, 9.0GB)",
+        "deepseek-r1:8b (Q4_K_M, 4.9GB)",
+        "deepseek-r1:7b (Q4_K_M, 4.7GB)",
+        "deepseek-r1:1.5b (Q4_K_M, 1.1GB)",
         "qwen2:0.5b (Q4_0, 352MB)",
         "qwen2.5:0.5b-instruct (Q4_K_M, 398MB)",
         "qwen2:1.5b (Q4_0, 935MB)",

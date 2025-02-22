@@ -1,14 +1,17 @@
-from ollama import Client
+from ollama import Client, ListResponse
+from ollama import list as OllamaList
 from tqdm import tqdm
 from PIL import Image
 from io import BytesIO
 import base64
 import re
 import os
+import json
 import comfy.model_management
 import comfy.utils
 import folder_paths
 from .config import configurations
+
 
 multimodal_models = list(configurations["multimodal_models"])
 text_models = list(configurations["text_models"])
@@ -45,11 +48,9 @@ class OllamaUtil:
         return image_base64
     
     def get_models(self):
-        try:
-            return [model_l['name'] for model_l in self.client.list()['models']]
-        except Exception as e:
-            return [model_l['model'] for model_l in self.client.list()['models']]
-
+        response: ListResponse = OllamaList()
+        return [model.model for model in response.models]
+            
     def pull_model(self, model, client):
         current_digest, bars = '', {}
         for progress in client.pull(model, stream=True):
@@ -68,7 +69,14 @@ class OllamaUtil:
                 bars[digest].update(completed - bars[digest].n)
 
             current_digest = digest
-           
+
+    def validate_json_syntax(json_str):
+        try:
+            json.loads(json_str)
+            return True, "JSON Invalid."
+        except json.JSONDecodeError as e:
+            return False, f"Error in the JSON sintaxe: {e}"
+
 class OllamaCaptionerExtraOptions:
     def __init__(self):
         pass
@@ -138,6 +146,7 @@ class OllamaImageCaptioner:
             },
             "optional": {
                 "extra_options": ("Extra_Options", ),
+                "structured_output_format": ("STRING", { "forceInput": True, "default": None }),
             }
         } 
           
@@ -149,7 +158,7 @@ class OllamaImageCaptioner:
 
     CATEGORY = "Ollama"
 
-    def run_captioner(self, model, custom_model, api_host, timeout, low_vram, keep_model_alive, input_dir,output_dir, max_images,caption_type,caption_length,name, custom_prompt, top_p,temperature, prefix_caption, suffix_caption, extra_options=[]):
+    def run_captioner(self, model, custom_model, api_host, timeout, low_vram, keep_model_alive, input_dir,output_dir, max_images,caption_type,caption_length,name, custom_prompt, top_p,temperature, prefix_caption, suffix_caption, extra_options=[], structured_output_format=None):
         
         client = Client(api_host, timeout=timeout)
         
@@ -212,6 +221,9 @@ class OllamaImageCaptioner:
             if filename.lower().endswith((".jpg", ".png", ".jpeg", ".bmp", ".webp")) & (max_images == -1 or image_count < max_images):
                 image_count += 1
         
+        if structured_output_format != None and type(structured_output_format) == str:
+            structured_output_format = json.loads(structured_output_format.replace("'", '"'))
+
         pbar = comfy.utils.ProgressBar(image_count)
         step = 0
         for filename in os.listdir(input_dir):
@@ -232,7 +244,7 @@ class OllamaImageCaptioner:
                         image_base64 = [str(image_base64, 'utf-8')]
                         
                         print('Generating Description from Image')
-                        full_response =  client.generate(model=model, system=system_context, prompt=prompt_str, images=image_base64, keep_alive=keep_model_alive, stream=False, options={
+                        full_response =  client.generate(model=model, system=system_context, prompt=prompt_str, images=image_base64, keep_alive=keep_model_alive, stream=False, format=structured_output_format, options={
                                 'temperature': temperature,
                                 'top_p': top_p,
                                 'main_gpu': 0,
@@ -326,17 +338,17 @@ class OllamaImageDescriber:
                 "images": ("IMAGE",),  
                 "system_context": ("STRING", {
                     "multiline": True,
-                    "default": """You are an assistant who describes the content and composition of images. 
-Describe only what you see in the image, not what you think the image is about.Be factual and literal. 
-Do not use metaphors or similes. 
-Be concise.""",
+                    "default": """You are a helpful AI assistant specialized in generating detailed and accurate textual descriptions of images. Your task is to analyze the information provided about an image and create a clear, concise, and informative description. Focus on the key elements of the image, such as objects, people, actions, and the overall scene. Ensure the description is easy to understand and relevant to the context.""",
                     "title":"system"
                 }),
                 "prompt": ("STRING", {
-                    "default": "Return a list of danbooru tags for this image, formatted as lowercase, separated by commas.",
+                    "default": """Describe the following image in detail, focusing on its key elements such as objects, people, actions, and the overall scene. Provide a clear and concise description that highlights the most important aspects. Image:""",
                     "multiline": True
                 })
             },
+            "optional": {
+                "structured_output_format": ("STRING", { "forceInput": True, "default": None }),
+            }
         }
 
     RETURN_TYPES = ("STRING",)
@@ -363,7 +375,8 @@ Be concise.""",
                               keep_model_alive,
                               prompt,
                               system_context,
-                              images):
+                              images, 
+                              structured_output_format=None):
         
         client = Client(api_host, timeout=timeout)
         
@@ -382,6 +395,9 @@ Be concise.""",
             
         print('System Context: "{}"'.format(system_context))
         print('Prompt: "{}"'.format(prompt))
+
+        if structured_output_format != None and type(structured_output_format) == str:
+            structured_output_format = json.loads(structured_output_format.replace("'", '"'))
         
         full_response = ""
         
@@ -397,7 +413,7 @@ Be concise.""",
             
             
         print('Generating Description from Image')
-        full_response =  client.generate(model=model, system=system_context, prompt=prompt, images=images_base64, keep_alive=keep_model_alive, stream=False, options={
+        full_response =  client.generate(model=model, system=system_context, prompt=prompt, images=images_base64, keep_alive=keep_model_alive, stream=False, format=structured_output_format, options={
                 'num_ctx': num_ctx,
                 'num_predict': max_tokens,
                 'temperature': temperature,
@@ -413,8 +429,6 @@ Be concise.""",
         
         print('Finalized')
         return (result, )
-
-
 
 
 class OllamaTextDescriber:
@@ -485,25 +499,17 @@ class OllamaTextDescriber:
                 }),
                 "system_context": ("STRING", {
                     "multiline": True,
-                    "default": """Your job is to generate prompts to be used in stable diffusion/midjourney,
-you will receive a text and you need to extract the most important information/characteristics from this text and transform this into tags in booru format.
-                    """,
+                    "default": """You are a helpful AI assistant specialized in generating detailed and accurate textual descriptions. Your task is to analyze the input provided and create a clear, concise, and informative description. Focus on the key aspects of the input, and ensure the description is easy to understand and relevant to the context.""",
                     "title":"system"
                 }),
                 "prompt": ("STRING", {
-                    "default": """Extract the booru tags from this text in detail but do not extract text information, such as the artist, return a line with the tags in lowercase letters and separated by commas in the following format: <TAGS>tag1, tag2, tag3</TAGS>.
-
-Example:
-Input: "A beautiful scenery with mountains and a light blue river."
-Output: <TAGS>scenery, mountains, (light blue river:1.2)</TAGS>
-
-Input: "A portrait of a woman with a red dress and a hat."
-Output: <TAGS>portrait, woman, (red dress:1.2), hat</TAGS>
-
-Now, extract the tags from the following text: """,
+                    "default": """Describe the following input in detail, focusing on its key features and context. Provide a clear and concise description that highlights the most important aspects. Input:""",
                     "multiline": True
                 })
             },
+            "optional": {
+                "structured_output_format": ("STRING", { "forceInput": True, "default": None }),
+            }
         }
 
     RETURN_TYPES = ("STRING",)
@@ -529,7 +535,8 @@ Now, extract the tags from the following text: """,
                              max_tokens, 
                              keep_model_alive, 
                              prompt, 
-                             system_context):
+                             system_context,
+                             structured_output_format=None):
         
         client = Client(api_host, timeout=timeout)
         ollama_util = OllamaUtil(client)
@@ -548,10 +555,13 @@ Now, extract the tags from the following text: """,
         print('System Context: "{}"'.format(system_context))
         print('Prompt: "{}"'.format(prompt))
         
+        if structured_output_format != None and type(structured_output_format) == str:
+            structured_output_format = json.loads(structured_output_format.replace("'", '"'))
+
         full_response = ""
                 
         print('Generating Response')
-        full_response =  client.generate(model=model, system=system_context, prompt=prompt, keep_alive=keep_model_alive, stream=False, options={
+        full_response =  client.generate(model=model, system=system_context, prompt=prompt, keep_alive=keep_model_alive, stream=False, format=structured_output_format, options={
                 'num_ctx': num_ctx,
                 'num_predict': max_tokens,
                 'temperature': temperature,
@@ -649,6 +659,63 @@ class InputText:
     def run(self, text):
         return (text,)
     
+class StructuredOutputFormat:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required":{ "string": ("STRING", {"default": "", "multiline": True }) }}
+    
+    FUNCTION = "run"
+    CATEGORY = "Ollama"
+    RETURN_TYPES = ("STRING",)
+
+class JsonPropertyExtractorNode:
+    """
+    A custom node that takes a JSON string and a property path (e.g., "user.father.name"),
+    and returns the value of the specified property.
+    """
+    @classmethod
+    def INPUT_TYPES(cls):
+        """
+        Defines the input types for the node.
+        """
+        return {
+            "required": {
+                "json_input": ("STRING", {"multiline": True, "default": "{}"}),
+                "property_path": ("STRING", {"default": ""}),  # Property path (e.g., "user.father.name")
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("selected_value",)
+    FUNCTION = "run"
+    CATEGORY = "Custom Nodes/JSON"
+
+    def run(self, json_input: str, property_path: str):
+        """
+        Executes the node.
+        """
+        if not json_input or not property_path:
+            raise ValueError("JSON input and property path are required.")
+
+        try:
+            json_data = json.loads(json_input)
+
+            path_parts = property_path.split(".")
+
+            current_value = json_data
+            for part in path_parts:
+                if isinstance(current_value, dict) and part in current_value:
+                    current_value = current_value[part]
+                else:
+                    raise ValueError(f"Property '{part}' not found in JSON.")
+
+            # Return the found value
+            return (str(current_value),)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Error decoding JSON: {e}")
+        except Exception as e:
+            raise ValueError(f"Unexpected error: {e}")
+    
 # class ShowText:
 #     @classmethod
 #     def INPUT_TYPES(s):
@@ -672,7 +739,8 @@ NODE_CLASS_MAPPINGS = {
     "OllamaTextDescriber": OllamaTextDescriber,
     "TextTransformer": TextTransformer,
     "InputText": InputText,
-    "OllamaCaptionerExtraOptions": OllamaCaptionerExtraOptions
+    "OllamaCaptionerExtraOptions": OllamaCaptionerExtraOptions,
+    "JsonPropertyExtractorNode": JsonPropertyExtractorNode
     # "ShowText": ShowText
 }
 
@@ -683,6 +751,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "OllamaTextDescriber": "🦙 Ollama Text Describer 🦙",
     "TextTransformer": "📝 Text Transformer 📝",
     "InputText": "📝 Input Text (Multiline) 📝",
-    "OllamaCaptionerExtraOptions": "🦙 Ollama Captioner Extra Options 🦙"
+    "OllamaCaptionerExtraOptions": "🦙 Ollama Captioner Extra Options 🦙",
+    "JsonPropertyExtractorNode": "📝 Json Property Extractor 📝"
     # "ShowText": "📝 Show Text 📝"
 }
