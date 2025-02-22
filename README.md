@@ -90,7 +90,7 @@ pip install -r requirements.txt
 
 ### **JSON Property Extractor** 📑
 
-![JSON Property Extractor](images/image-6.png)
+![JSON Property Extractor](images/image-7.png)
 
 - Used to extract specific values from structured JSON outputs returned by **Ollama Image Describer** or **Ollama Text Describer**.
 - Works by selecting a key (or path) inside a JSON structure and outputting only the requested data.
