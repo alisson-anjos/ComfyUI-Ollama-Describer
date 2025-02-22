@@ -108,6 +108,8 @@ pip install -r requirements.txt
 
 ![Ollama Image Captioner](images/image-4.png)
 
+![Ollama Image Example](images/captioner.png)
+
 - Automatically generates concise and relevant captions for images.
 - Processes images from a specified folder, iterates through each file, and generates `.txt` caption files saved in the output directory.
 - Useful for bulk image captioning, dataset preparation, and AI-assisted annotation.
