@@ -5,9 +5,6 @@
 ### [22-02-2025] Added Support for Pydantic Schema Input
 
 - Now, nodes can accept **Pydantic Schemas** as input, making it easier to define structured outputs.
-
-- Example use case:
-
 - To generate Pydantic schemas, you can use the **Python Interpreter Node** by [Christian Byrne](https://github.com/christian-byrne/python-interpreter-node).
 
 ---
