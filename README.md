@@ -50,7 +50,7 @@ Path should be `custom_nodes\ComfyUI-Ollama-Describer`.
 
 Run `install.bat`
 
-#### Linux/Mac:
+#### Linux/Mac/Windows:
 
 ```bash
 pip install -r requirements.txt
