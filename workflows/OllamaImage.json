@@ -1,0 +1,834 @@
+{
+  "id": "bd93e0fc-2b3d-48b8-be23-80d07d128175",
+  "revision": 0,
+  "last_node_id": 47,
+  "last_link_id": 47,
+  "nodes": [
+    {
+      "id": 8,
+      "type": "VAEDecode",
+      "pos": [
+        1770,
+        -110
+      ],
+      "size": [
+        210,
+        46
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 7
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            9
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 7,
+      "type": "CLIPTextEncode",
+      "pos": [
+        970,
+        90
+      ],
+      "size": [
+        384.05340576171875,
+        147.19100952148438
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            6
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "text, watermark"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "CLIPTextEncode",
+      "pos": [
+        990,
+        -20
+      ],
+      "size": [
+        346.0589599609375,
+        58
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 3
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 26
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "Generate an image of a woman standing in a room with a brown shirt and leopard print skirt, surrounded by potted plants, as if posing for a camera at a themed event."
+      ]
+    },
+    {
+      "id": 5,
+      "type": "EmptyLatentImage",
+      "pos": [
+        1030,
+        310
+      ],
+      "size": [
+        315,
+        106
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            2
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "widgets_values": [
+        768,
+        768,
+        1
+      ]
+    },
+    {
+      "id": 34,
+      "type": "Note",
+      "pos": [
+        1136,
+        -277
+      ],
+      "size": [
+        404.17962646484375,
+        88
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "You can use regex as a search parameter for replacement, to test your regex I recommend the website https://regexr.com/"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 9,
+      "type": "SaveImage",
+      "pos": [
+        2010,
+        -110
+      ],
+      "size": [
+        514.6949462890625,
+        672.7599487304688
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 9
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 40,
+      "type": "Note",
+      "pos": [
+        -511.1201477050781,
+        -275.1642150878906
+      ],
+      "size": [
+        361.96429443359375,
+        88
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Using gemma3 abliterrated (an uncensored model) https://ollama.com/huihui_ai/gemma3-abliterated:4b-q8_0"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 11,
+      "type": "LoadImage",
+      "pos": [
+        -959,
+        -117
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "shape": 3,
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            36
+          ]
+        },
+        {
+          "name": "MASK",
+          "shape": 3,
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "1c984d049f6cd66cfa9b8d962d702edf.jpg",
+        "image",
+        ""
+      ]
+    },
+    {
+      "id": 43,
+      "type": "Text Multiline",
+      "pos": [
+        -1030.8740234375,
+        531.5084228515625
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            40
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "was-node-suite-comfyui",
+        "ver": "831199b898394c0385576d80628fce6b7931d317",
+        "Node name for S&R": "Text Multiline"
+      },
+      "widgets_values": [
+        "Generate visual tags based on the reference image.\n"
+      ]
+    },
+    {
+      "id": 41,
+      "type": "Text Multiline",
+      "pos": [
+        -1026.704345703125,
+        262.8573913574219
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            39
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "was-node-suite-comfyui",
+        "ver": "831199b898394c0385576d80628fce6b7931d317",
+        "Node name for S&R": "Text Multiline"
+      },
+      "widgets_values": [
+        "You are a visual tag extractor for AI image generation. Given an image, return a single line of concise booru-style tags. Use only lowercase, comma-separated tags. Emphasize visual elements like subject, colors, materials, environment, lighting, and style. Do NOT include names of copyrighted characters, text seen in the image, or repeat tags. Remove duplicate tags and limit the tag count to a maximum of 20. If a tag is important and needs emphasis, use the format (tag:1.2). Your entire output must be just the final tag list, nothing else.\n"
+      ]
+    },
+    {
+      "id": 19,
+      "type": "TextTransformer",
+      "pos": [
+        17.093996047973633,
+        -67.61312103271484
+      ],
+      "size": [
+        400,
+        238
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 45
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "shape": 3,
+          "type": "STRING",
+          "slot_index": 0,
+          "links": [
+            26,
+            46
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-ollama-describer",
+        "ver": "a0736cead2149b02e794d5d4ab0b3f43bac6366d",
+        "Node name for S&R": "TextTransformer"
+      },
+      "widgets_values": [
+        "",
+        "",
+        ", high quality, photorealistic",
+        "normal",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 39,
+      "type": "OllamaImageDescriber",
+      "pos": [
+        -534.411376953125,
+        -114.48054504394531
+      ],
+      "size": [
+        400,
+        498
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 36
+        },
+        {
+          "name": "history_config",
+          "shape": 7,
+          "type": "ollama_history_config",
+          "link": null
+        },
+        {
+          "name": "structured_output_format",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "structured_output_format"
+          },
+          "link": null
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 40
+        },
+        {
+          "name": "system_context",
+          "type": "STRING",
+          "widget": {
+            "name": "system_context"
+          },
+          "link": 39
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            45,
+            47
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-ollama-describer",
+        "ver": "a0736cead2149b02e794d5d4ab0b3f43bac6366d",
+        "Node name for S&R": "OllamaImageDescriber"
+      },
+      "widgets_values": [
+        "llava:7b-v1.6-vicuna-q2_K (Q2_K, 3.2GB)",
+        "huihui_ai/gemma3-abliterated:4b-q8_0",
+        "http://localhost:11434",
+        300,
+        0.30000000000000004,
+        40,
+        0.9,
+        1.1,
+        46,
+        2048,
+        200,
+        0,
+        "You are a helpful AI assistant specialized in generating detailed and accurate descriptions of images.",
+        "Describe the following image in detail. Image:",
+        "",
+        false
+      ]
+    },
+    {
+      "id": 3,
+      "type": "KSampler",
+      "pos": [
+        1420,
+        -110
+      ],
+      "size": [
+        315,
+        474
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 4
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 6
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            7
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        725003447507013,
+        "randomize",
+        20,
+        4,
+        "euler",
+        "normal",
+        1
+      ]
+    },
+    {
+      "id": 46,
+      "type": "easy showAnything",
+      "pos": [
+        17.954666137695312,
+        -274.4844970703125
+      ],
+      "size": [
+        394.297607421875,
+        144.60714721679688
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 47
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.2.7",
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "Cartoon, blue, character, mammal, fur, eyes, headshot, face, smile, cool, fun, vibrant, color, bright, cartoonish, stylized, fun, group, mascot, cool, action, pose, vibrant, fun"
+      ]
+    },
+    {
+      "id": 45,
+      "type": "easy showAnything",
+      "pos": [
+        464.8435974121094,
+        -280.0628967285156
+      ],
+      "size": [
+        446.76190185546875,
+        156.71429443359375
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 46
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.2.7",
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "Cartoon, blue, character, mammal, fur, eyes, headshot, face, smile, cool, fun, vibrant, color, bright, cartoonish, stylized, fun, group, mascot, cool, action, pose, vibrant, fun, high quality, photorealistic"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        519.9172973632812,
+        79.11886596679688
+      ],
+      "size": [
+        315,
+        98
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "slot_index": 0,
+          "links": [
+            1
+          ]
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "slot_index": 1,
+          "links": [
+            3,
+            5
+          ]
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "slot_index": 2,
+          "links": [
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "majicmixRealistic_v7.safetensors"
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      4,
+      0,
+      3,
+      0,
+      "MODEL"
+    ],
+    [
+      2,
+      5,
+      0,
+      3,
+      3,
+      "LATENT"
+    ],
+    [
+      3,
+      4,
+      1,
+      6,
+      0,
+      "CLIP"
+    ],
+    [
+      4,
+      6,
+      0,
+      3,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      5,
+      4,
+      1,
+      7,
+      0,
+      "CLIP"
+    ],
+    [
+      6,
+      7,
+      0,
+      3,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      7,
+      3,
+      0,
+      8,
+      0,
+      "LATENT"
+    ],
+    [
+      8,
+      4,
+      2,
+      8,
+      1,
+      "VAE"
+    ],
+    [
+      9,
+      8,
+      0,
+      9,
+      0,
+      "IMAGE"
+    ],
+    [
+      26,
+      19,
+      0,
+      6,
+      1,
+      "STRING"
+    ],
+    [
+      36,
+      11,
+      0,
+      39,
+      0,
+      "IMAGE"
+    ],
+    [
+      39,
+      41,
+      0,
+      39,
+      4,
+      "STRING"
+    ],
+    [
+      40,
+      43,
+      0,
+      39,
+      3,
+      "STRING"
+    ],
+    [
+      45,
+      39,
+      0,
+      19,
+      0,
+      "STRING"
+    ],
+    [
+      46,
+      19,
+      0,
+      45,
+      0,
+      "*"
+    ],
+    [
+      47,
+      39,
+      0,
+      46,
+      0,
+      "*"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7433628318584091,
+      "offset": [
+        1207.4228386897569,
+        346.3299405805445
+      ]
+    },
+    "ue_links": [],
+    "VHS_latentpreview": true,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

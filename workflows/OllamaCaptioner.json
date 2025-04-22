@@ -1,58 +1,20 @@
 {
-  "last_node_id": 6,
-  "last_link_id": 3,
+  "id": "32ea6834-a30c-4084-80f3-fdc8cfd0d4b2",
+  "revision": 0,
+  "last_node_id": 7,
+  "last_link_id": 6,
   "nodes": [
-    {
-      "id": 2,
-      "type": "ShowText|pysssss",
-      "pos": {
-        "0": 1551,
-        "1": 288
-      },
-      "size": {
-        "0": 315,
-        "1": 76
-      },
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 2,
-          "widget": {
-            "name": "text"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": null,
-          "shape": 6
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "ShowText|pysssss"
-      },
-      "widgets_values": [
-        "",
-        "result: finished count: 1, error count: 0"
-      ]
-    },
     {
       "id": 5,
       "type": "Note",
-      "pos": {
-        "0": 1110,
-        "1": 120
-      },
-      "size": {
-        "0": 372.7138977050781,
-        "1": 65.00820922851562
-      },
+      "pos": [
+        1110,
+        120
+      ],
+      "size": [
+        372.7138977050781,
+        88
+      ],
       "flags": {},
       "order": 0,
       "mode": 0,
@@ -68,14 +30,14 @@
     {
       "id": 3,
       "type": "OllamaCaptionerExtraOptions",
-      "pos": {
-        "0": 191,
-        "1": 164
-      },
-      "size": {
-        "0": 824.2591552734375,
-        "1": 444.3465576171875
-      },
+      "pos": [
+        191,
+        164
+      ],
+      "size": [
+        824.2591552734375,
+        444.3465576171875
+      ],
       "flags": {},
       "order": 1,
       "mode": 0,
@@ -84,13 +46,16 @@
         {
           "name": "Extra_Options",
           "type": "Extra_Options",
+          "slot_index": 0,
           "links": [
-            3
-          ],
-          "slot_index": 0
+            3,
+            4
+          ]
         }
       ],
       "properties": {
+        "cnr_id": "comfyui-ollama-describer",
+        "ver": "a0736cead2149b02e794d5d4ab0b3f43bac6366d",
         "Node name for S&R": "OllamaCaptionerExtraOptions"
       },
       "widgets_values": [
@@ -114,25 +79,82 @@
       ]
     },
     {
-      "id": 4,
+      "id": 2,
+      "type": "ShowText|pysssss",
+      "pos": [
+        1556.0101318359375,
+        205.30674743652344
+      ],
+      "size": [
+        315,
+        112
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "universal-styler",
+        "ver": "bfe88489ff250a84bc25c210d84a58135f9a8a8f",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "",
+        "result: finished count: 1, error count: 0"
+      ]
+    },
+    {
+      "id": 7,
       "type": "OllamaImageCaptioner",
-      "pos": {
-        "0": 1112,
-        "1": 234
-      },
-      "size": {
-        "0": 352.79998779296875,
-        "1": 442
-      },
+      "pos": [
+        1118.177490234375,
+        262.8188781738281
+      ],
+      "size": [
+        352.79998779296875,
+        510
+      ],
       "flags": {},
       "order": 2,
       "mode": 0,
       "inputs": [
         {
           "name": "extra_options",
+          "shape": 7,
           "type": "Extra_Options",
-          "link": 3,
-          "shape": 7
+          "link": 4
+        },
+        {
+          "name": "history_config",
+          "shape": 7,
+          "type": "ollama_history_config",
+          "link": null
+        },
+        {
+          "name": "structured_output_format",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "structured_output_format"
+          },
+          "link": null
         }
       ],
       "outputs": [
@@ -140,12 +162,13 @@
           "name": "STRING",
           "type": "STRING",
           "links": [
-            2
-          ],
-          "slot_index": 0
+            6
+          ]
         }
       ],
       "properties": {
+        "cnr_id": "comfyui-ollama-describer",
+        "ver": "a0736cead2149b02e794d5d4ab0b3f43bac6366d",
         "Node name for S&R": "OllamaImageCaptioner"
       },
       "widgets_values": [
@@ -153,50 +176,57 @@
         "",
         "http://localhost:11434",
         300,
-        "C:\\Users\\Alisson\\Downloads\\TestOllama",
         "",
+        "[put here the directory where the images are]",
         1,
-        true,
-        -1,
+        false,
+        0,
         0.9,
-        0.2,
+        0.20000000000000004,
         "FLUX/SD3+",
         "medium-length",
         "M1CJ4K",
         "",
         "",
-        ""
+        "",
+        "",
+        false
       ]
     }
   ],
   "links": [
     [
-      2,
       4,
+      3,
+      0,
+      7,
+      0,
+      "Extra_Options"
+    ],
+    [
+      6,
+      7,
       0,
       2,
       0,
       "STRING"
-    ],
-    [
-      3,
-      3,
-      0,
-      4,
-      0,
-      "Extra_Options"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.8390545288824308,
+      "scale": 0.8994690265486728,
       "offset": [
-        -176.94617270899832,
-        -70.98915349852203
+        -40.851200640081885,
+        11.576330153919754
       ]
-    }
+    },
+    "ue_links": [],
+    "VHS_latentpreview": true,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
   },
   "version": 0.4
 }
