@@ -47,8 +47,8 @@ class OllamaUtil:
             image_base64 = base64.b64encode(image_bytes)
         return image_base64
     
-    def get_models(self):
-        response: ListResponse = OllamaList()
+    def get_models(self, client):
+        response: ListResponse = client.list()
         return [model.model for model in response.models]
             
     def pull_model(self, model, client):
@@ -382,7 +382,7 @@ class OllamaImageDescriber:
         
         ollama_util = OllamaUtil(client)
         
-        models = ollama_util.get_models()
+        models = ollama_util.get_models(client)
         
         model = model.split(' ')[0].strip()
         custom_model = custom_model.strip()
