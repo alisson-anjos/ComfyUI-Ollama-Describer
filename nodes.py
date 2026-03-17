@@ -1118,17 +1118,21 @@ class OllamaTool_PythonCode:
         import textwrap
         
         # We need to compile and extract the function from the user's string
-        local_scope = {}
+        # To ensure the defined function has access to the external variables (kwargs),
+        # we must include them in the globals dictionary passed to exec.
+        tool_globals = globals().copy()
+        tool_globals.update(kwargs)
         
-        # Inject any kwargs (from the ANY inputs) directly into the environment where the code runs!
-        local_scope.update(kwargs)
+        # We use a separate local_dict to capture ONLY the newly defined function(s)
+        local_dict = {}
         
         try:
-            # Execute the user's code definition to create the function in local_scope
-            exec(python_code, globals(), local_scope)
+            # Execute the user's code definition. 
+            # Functions defined here will have tool_globals as their __globals__
+            exec(python_code, tool_globals, local_dict)
             
             # Find the first callable object defined that isn't a built-in
-            funcs = [v for k, v in local_scope.items() if callable(v)]
+            funcs = [v for k, v in local_dict.items() if callable(v)]
             if not funcs:
                 raise ValueError("No valid function definition found in the provided code.")
                 
