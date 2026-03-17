@@ -70,11 +70,25 @@ pip install -r requirements.txt
 
 The **Ollama Agent** is an autonomous node that can use connected tools to answer questions. It doesn't just generate text; it enters a reasoning loop (**ReAct**) where it can call tools, analyze results, and "think" before giving a final answer.
 
-#### **Key Features:**
-- **Iterative Reasoning**: The agent stays in a loop until it has enough information.
-- **Tool Support**: Connect `OLLAMA_TOOL` nodes (like Web Search) to expand its capabilities.
-- **Thinking Mode**: Enabled for models like **Qwen 3.5**, **DeepSeek-R1**, or **GPT-OSS** to show the model's internal reasoning process.
-- **Console Logs**: View exactly what tools the agent is calling and what it's "thinking" in the ComfyUI console.
+#### **Key Parameters:**
+- **`model`**: Select models optimized for tool calling (e.g., Llama 3.1, Qwen 3.5).
+- **`tools`**: Connect `OLLAMA_TOOL` nodes (like Web Search).
+- **`think`**: Enable reasoning chains for compatible models (Qwen 3.5, DeepSeek-R1).
+- **`system_context`**: Default instructions that force the model to use tools for real-time data.
+- **`max_tokens`**: Limit the response length (default 2048).
+
+---
+
+### **Ollama Video Describer** 🎥🔍
+
+![Ollama Video Describer](images/video_node.png)
+
+Similar to the Image Describer, but optimized for processing video frames or sequences. It allows for detailed temporal analysis using vision-enabled models.
+
+#### **Key Parameters:**
+- **`num_ctx`**: Context window size (default 4096, increase for longer descriptions).
+- **`max_tokens`**: Maximum length of the video description.
+- **`keep_model_alive`**: Manage VRAM by deciding how long to keep the model loaded.
 
 ---
 
