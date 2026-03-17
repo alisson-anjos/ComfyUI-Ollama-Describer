@@ -94,6 +94,7 @@ Similar to the Image Describer, but optimized for processing video frames or seq
 
 ### **Web Search Tool** 🌐🔍
 
+- **`tool_name`**: Custom name for the tool (e.g., "google_search"). This is how the Agent will refer to it in its thinking process.
 - **DuckDuckGo (free)**: No setup needed, search the web for free.
 - **Ollama API**: Highly accurate search results, requires a free API key from [ollama.com](https://ollama.com/settings/keys).
 - **Max Results**: Control how many snippets are fed back to the Agent.
