@@ -159,7 +159,14 @@
         "minicpm-v:8b (Q4_0, 5.5GB)",
         "moondream:1.8b (Q4, 1.7GB)",
         "moondream:1.8b-v2-q6_K (Q6, 2.1GB)",
-        "moondream:1.8b-v2-fp16 (F16, 3.7GB)"
+        "moondream:1.8b-v2-fp16 (F16, 3.7GB)",
+        "qwen3.5:0.8b (1.0GB)",
+        "qwen3.5:2b (2.7GB)",
+        "qwen3.5:4b (3.4GB)",
+        "qwen3.5:9b (6.6GB)",
+        "qwen3.5:27b (17GB)",
+        "qwen3.5:cloud",
+        "qwen3.5:397b-cloud"
     ],
     "text_models": [
         "deepscaler:1.5b (F16, 3.6GB)",
@@ -175,6 +182,13 @@
         "qwen2.5:7b (Q4_K_M, 4.7GB)",
         "qwen2.5:7b-instruct (Q4_K_M, 4.7GB)",
         "qwen2:7b (Q4_0, 4.4GB)",
+        "qwen3.5:0.8b (1.0GB)",
+        "qwen3.5:2b (2.7GB)",
+        "qwen3.5:4b (3.4GB)",
+        "qwen3.5:9b (6.6GB)",
+        "qwen3.5:27b (17GB)",
+        "qwen3.5:cloud",
+        "qwen3.5:397b-cloud",
         "gemma:2b (Q4_0, 1.7GB)",
         "gemma:7b (Q4_0, 5.0GB)",
         "gemma2:9b (Q4_0, 5.4GB)",
@@ -195,5 +209,27 @@
         "llama3.2:3b-instruct-q4_0 (Q4_0, 1.9GB)",
         "llama3.2:3b-instruct-q8_0 (Q8_0, 3.4GB)",
         "mistral:7b (Q4_0, 4.1GB)"
+    ],
+    "tool_calling_models": [
+        "qwen3.5:0.8b (1.0GB)",
+        "qwen3.5:2b (2.7GB)",
+        "qwen3.5:4b (3.4GB)",
+        "qwen3.5:9b (6.6GB)",
+        "qwen3.5:27b (17GB)",
+        "qwen3.5:cloud",
+        "qwen3.5:397b-cloud",
+        "llama3.1:8b (Q4_0, 4.7GB)",
+        "llama3.1:8b-instruct-q8_0 (Q8_0, 8.5GB)",
+        "llama3.2:1b-instruct-q8_0 (Q8_0, 1.3GB)",
+        "llama3.2:3b-instruct-q8_0 (Q8_0, 3.4GB)",
+        "mistral:7b (Q4_0, 4.1GB)",
+        "phi4:14b (Q4_K_M, 9.1GB)",
+        "granite4:8b (Q4_K_M, 4.9GB)",
+        "nemotron-3-super:12b (Q4_K_M, 7.5GB)",
+        "lfm2:latest",
+        "qwen3-coder-next:latest",
+        "ministral-3:latest",
+        "glm-4.7-flash:latest",
+        "qwen3-vl:latest"
     ]
 }
