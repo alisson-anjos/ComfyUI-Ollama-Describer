@@ -41,7 +41,7 @@ const create_documentation_stylesheet = () => {
         z-index: 5;
         overflow: hidden;
        }
-       .content-wrapper {
+       .ollama-describer-content-wrapper {
         overflow: auto;
         max-height: 100%;
         width: 300px; /* Default size */
@@ -93,7 +93,7 @@ const create_documentation_stylesheet = () => {
         docElement.appendChild(contentWrapper);
 
         create_documentation_stylesheet()
-        contentWrapper.classList.add('content-wrapper');
+        contentWrapper.classList.add('ollama-describer-content-wrapper');
         docElement.classList.add('ollama-documentation-popup')
         
         // Simple plain text parsing (we don't import marked/DOMPurify to save space, relies on pre-formatted python text)
