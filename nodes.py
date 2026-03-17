@@ -951,6 +951,10 @@ class OllamaTool_WebSearch:
     def INPUT_TYPES(s):
         return {
             "required": {
+                "tool_name": ("STRING", {
+                    "default": "search_internet",
+                    "tooltip": "The name of the tool as seen by the Agent. You can change this to 'google_search' or 'web_lookup' to help the agent understand when to use it."
+                }),
                 "search_provider": (["DuckDuckGo (free)", "Ollama API (requires key)"], {
                     "default": "DuckDuckGo (free)",
                     "tooltip": "Choose the search engine. DuckDuckGo is free and requires no configuration. Ollama API gives better results but requires an API key from ollama.com/settings/keys."
@@ -976,7 +980,7 @@ class OllamaTool_WebSearch:
 
 📚 <a href='https://docs.ollama.com/capabilities/web-search' target='_blank'>Ollama Docs: Web Search</a>"""
 
-    def get_tool(self, search_provider="DuckDuckGo (free)", max_results=5, ollama_api_key=""):
+    def get_tool(self, tool_name="search_internet", search_provider="DuckDuckGo (free)", max_results=5, ollama_api_key=""):
         _max_results = max_results
         
         if search_provider == "Ollama API (requires key)":
@@ -1032,12 +1036,21 @@ class OllamaTool_WebSearch:
                 except Exception as e:
                     return f"Error performing web search: {str(e)}"
             
+        # Ensure the function has the user-defined name
+        search_internet.__name__ = tool_name
         return (search_internet,)
 
 class OllamaTool_FileSearch:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": {}}
+        return {
+            "required": {
+                "tool_name": ("STRING", {
+                    "default": "read_local_file",
+                    "tooltip": "The name of the tool as seen by the Agent."
+                })
+            }
+        }
     
     RETURN_TYPES = ("OLLAMA_TOOL",)
     RETURN_NAMES = ("tool",)
@@ -1045,7 +1058,7 @@ class OllamaTool_FileSearch:
     CATEGORY = "Ollama/Tools"
     DESCRIPTION = """Allows the Agent to read the contents of a local text file. Content is capped at 10,000 characters to avoid overflowing the model's context window."""
 
-    def get_tool(self):
+    def get_tool(self, tool_name="read_local_file"):
         def read_local_file(filepath: str) -> str:
             """Read the content of a local text file.
             
@@ -1069,6 +1082,8 @@ class OllamaTool_FileSearch:
             except Exception as e:
                 return f"Error reading file '{filepath}': {str(e)}"
             
+        # Ensure the function has the user-defined name
+        read_local_file.__name__ = tool_name
         return (read_local_file,)
 
 class OllamaTool_PythonCode:
@@ -1076,6 +1091,10 @@ class OllamaTool_PythonCode:
     def INPUT_TYPES(s):
         return {
             "required": {
+                "tool_name": ("STRING", {
+                    "default": "custom_python_tool",
+                    "tooltip": "The name of the tool as seen by the Agent. If left as 'custom_python_tool', it will try to use the function name defined in the code."
+                }),
                 "python_code": ("STRING", {
                     "multiline": True,
                     "default": 'def custom_tool(text: str) -> str:\n    """A helpful description of what this does.\n    \n    Args:\n        text: input text\n        \n    Returns:\n        a useful string\n    """\n    return f"Processed: {text} | {my_ext_var}"'
@@ -1095,7 +1114,7 @@ class OllamaTool_PythonCode:
     CATEGORY = "Ollama/Tools"
     DESCRIPTION = "Define an arbitrary Python function with docstrings to act as a custom Agent Tool. Inputs plugged into 'my_ext_var' will be globally available inside the function!"
 
-    def get_tool(self, python_code, **kwargs):
+    def get_tool(self, tool_name="custom_python_tool", python_code="", **kwargs):
         import textwrap
         
         # We need to compile and extract the function from the user's string
@@ -1112,6 +1131,10 @@ class OllamaTool_PythonCode:
             funcs = [v for k, v in local_scope.items() if callable(v)]
             if not funcs:
                 raise ValueError("No valid function definition found in the provided code.")
+                
+            # Optionally rename the function if a custom name was provided
+            if tool_name and tool_name != "custom_python_tool":
+                funcs[0].__name__ = tool_name
                 
             return (funcs[0],)
         except Exception as e:
