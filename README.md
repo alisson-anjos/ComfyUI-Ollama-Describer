@@ -2,25 +2,29 @@
 
 ## 🚀 News
 
-### [22-02-2025] Added Support for Pydantic Schema Input
+### [17-03-2025] New Autonomous Agent & Tool Calling 🤖🔍
 
-- Now, nodes can accept **Pydantic Schemas** as input, making it easier to define structured outputs.
-- To generate Pydantic schemas, you can use the **Python Interpreter Node** by [Christian Byrne](https://github.com/christian-byrne/python-interpreter-node).
+- **Autonomous Agent Node**: Added the `OllamaAgent` node that can perform iterative reasoning (ReAct) and call tools until it finds the answer.
+- **Web Search Tool**: New node to allow models to search the internet (DuckDuckGo or Ollama API).
+- **Thinking Support**: Added a 'Think' toggle for models like **Qwen 3.5**, **DeepSeek-R1**, and **GPT-OSS**.
+- **UI Enhancements**: Added password-style masking for API keys and improved model selection lists.
 
 ---
 
 ## Introduction
 
-This extension for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) enables the use of **Ollama LLM models**, such as **Gemma, Llava (multimodal), Llama2, Llama3, and Mistral**.
+This extension for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) enables the use of **Ollama LLM models**, such as **Qwen 3.5, DeepSeek-R1, Llama 3.1/3.2, and Mistral**.
 
 ### 📌 Features:
 
+- **Autonomous Agent** 🤖: An intelligent agent that can use tools, think, and search the web to answer complex queries.
+- **Web Search Tool** 🔍: Connect your Agent to the internet via DuckDuckGo (free) or the Ollama Search API.
+- **Support for 'Thinking' Models** 🧠: Full support for reasoning chains in models like Qwen 3.5 and DeepSeek.
 - **Ollama Image Describer** 🖼️: Generate structured descriptions of images.
 - **Ollama Text Describer** 📝: Extract meaningful insights from text.
 - **Ollama Image Captioner** 📷: Create automatic captions for images.
-- **Ollama Captioner Extra Options** ⚙️: Advanced customization for captions.
 - **Text Transformer** 🔄: Prepend, append, or modify text dynamically.
-- **JSON Property Extractor** 📑: Extract specific values from JSON outputs.
+- **JSON Property Extractor** 📑: Extract specific values from structured outputs.
 
 ## Installation
 
@@ -60,6 +64,28 @@ pip install -r requirements.txt
 
 ## Usage
 
+### **Ollama Agent & Tools** 🤖🛠️
+
+![Ollama Agent](images/agent_node.png)
+
+The **Ollama Agent** is an autonomous node that can use connected tools to answer questions. It doesn't just generate text; it enters a reasoning loop (**ReAct**) where it can call tools, analyze results, and "think" before giving a final answer.
+
+#### **Key Features:**
+- **Iterative Reasoning**: The agent stays in a loop until it has enough information.
+- **Tool Support**: Connect `OLLAMA_TOOL` nodes (like Web Search) to expand its capabilities.
+- **Thinking Mode**: Enabled for models like **Qwen 3.5**, **DeepSeek-R1**, or **GPT-OSS** to show the model's internal reasoning process.
+- **Console Logs**: View exactly what tools the agent is calling and what it's "thinking" in the ComfyUI console.
+
+---
+
+### **Web Search Tool** 🌐🔍
+
+- **DuckDuckGo (free)**: No setup needed, search the web for free.
+- **Ollama API**: Highly accurate search results, requires a free API key from [ollama.com](https://ollama.com/settings/keys).
+- **Max Results**: Control how many snippets are fed back to the Agent.
+
+---
+
 ### **Ollama Image Describer** 📷🔍
 
 ![Ollama Image Describer](images/image-2.png)
@@ -77,17 +103,14 @@ pip install -r requirements.txt
 - **`top_k`**, **`top_p`**, **`repeat_penalty`**: Fine-tune text generation.
 - **`max_tokens`**: Maximum response length in tokens.
 - **`seed_number`**: Set seed for reproducibility (-1 for random).
-- **`keep_model_alive`**: Defines how long the model stays loaded after execution:
-  - `0`: Unloads immediately.
-  - `-1`: Stays loaded indefinitely.
-  - Any other value (e.g., `10`) keeps it in memory for that number of **seconds**.
+- **`keep_model_alive`**: Defines how long the model stays loaded after execution.
 - **`prompt`**: The main instruction for the model.
 - **`system_context`**: Provide additional context for better responses.
 - **`structured_output_format`**: Accepts either a **Python dictionary** or a **valid JSON string** to define the expected response structure.
 
-### **JSON Property Extractor** 📑
+---
 
-![JSON Property Extractor](images/image-7.png)
+### **JSON Property Extractor** 📑
 
 - Used to extract specific values from structured JSON outputs returned by **Ollama Image Describer** or **Ollama Text Describer**.
 - Works by selecting a key (or path) inside a JSON structure and outputting only the requested data.
